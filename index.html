@@ -139,6 +139,39 @@ h1{
   color:#134e4a;
   box-shadow:0 4px 14px rgba(45,212,191,.30);
 }
+.btn-slang{
+  background:linear-gradient(135deg,#e0f7ff,#7dd3fc);
+  color:#0c4a6e;
+  box-shadow:0 4px 14px rgba(125,211,252,.40);
+  position:relative;overflow:hidden;
+}
+.btn-slang.active{
+  background:linear-gradient(135deg,#ccf0ff,#38bdf8);
+  color:#0c4a6e;
+  box-shadow:0 4px 18px rgba(56,189,248,.50);
+}
+.btn-slang .new-badge{
+  position:absolute;top:3px;right:5px;
+  font-size:.46rem;font-weight:900;
+  background:#7dd3fc;color:white;
+  border-radius:4px;padding:1px 4px;
+  letter-spacing:0.05em;
+  transition:opacity .3s;
+}
+.btn-slang.used .new-badge{display:none;}
+.btn-slang-color{
+  background:linear-gradient(135deg,#d4f5c8,#a8e890);
+  color:#2d6a1a;
+  box-shadow:0 4px 14px rgba(120,210,80,.30);
+  display:none;
+  transition:background 0.35s ease, box-shadow 0.35s ease, color 0.2s ease;
+}
+.btn-slang-color.visible{display:inline-flex;align-items:center;gap:5px;}
+/* 색깔별 테마 클래스 */
+.btn-slang-color.theme-green { background:linear-gradient(135deg,#d4f5c8,#86efac); color:#14532d; box-shadow:0 4px 14px rgba(74,222,128,.35); }
+.btn-slang-color.theme-sky   { background:linear-gradient(135deg,#e0f7ff,#7dd3fc); color:#0c4a6e; box-shadow:0 4px 14px rgba(125,211,252,.40); }
+.btn-slang-color.theme-pink  { background:linear-gradient(135deg,#fce7f3,#f9a8d4); color:#831843; box-shadow:0 4px 14px rgba(249,168,212,.40); }
+.btn-slang-color.theme-yellow{ background:linear-gradient(135deg,#fefce8,#fde68a); color:#713f12; box-shadow:0 4px 14px rgba(253,224,71,.40); }
 
 /* ── FLASH ── */
 #flash{position:fixed;inset:0;background:linear-gradient(135deg,#d1fae5,#ecfdf5);opacity:0;pointer-events:none;transition:opacity .06s;z-index:999;}
@@ -162,6 +195,8 @@ h1{
   display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
   box-shadow:0 32px 80px rgba(6,78,59,0.2), 0 0 0 1px rgba(255,255,255,0.8);
 }
+.ob-step{display:none;flex-direction:column;align-items:center;gap:14px;}
+.ob-step.active{display:flex;}
 .ob-emoji{font-size:3rem;animation:obBounce 1.3s ease-in-out infinite;}
 @keyframes obBounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(14px) scale(0.88);}}
 .ob-title{font-family:'Fredoka',sans-serif;font-size:1.9rem;color:#064e3b;letter-spacing:0.5px;}
@@ -175,6 +210,9 @@ h1{
   margin-top:4px;transition:transform .12s;
 }
 .ob-btn:active{transform:scale(.95);}
+.ob-dots{display:flex;gap:7px;margin-top:2px;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:rgba(52,211,153,0.3);transition:background .2s;}
+.ob-dot.on{background:#34d399;}
 
 /* ── UNLOCK TOAST ── */
 #unlockToast{
@@ -237,10 +275,33 @@ h1{
 <!-- ONBOARDING -->
 <div id="onboarding">
   <div class="ob-card">
-    <div class="ob-emoji">👆</div>
-    <div class="ob-title">왁뿌볼 🫧</div>
-    <div class="ob-sub">꾹 눌러서<br>왁스를 부숴봐요!</div>
-    <button class="ob-btn" onclick="dismissOnboarding()">해볼게요!</button>
+    <!-- Step 1 -->
+    <div class="ob-step active" id="ob1">
+      <div class="ob-emoji">🫧</div>
+      <div class="ob-title">왁뿌볼</div>
+      <div class="ob-sub">꾹 눌러서<br>왁스를 부숴봐요!</div>
+      <button class="ob-btn" onclick="obNext()">다음 →</button>
+    </div>
+    <!-- Step 2 -->
+    <div class="ob-step" id="ob2">
+      <div class="ob-emoji">❄️</div>
+      <div class="ob-title">냉동 & 향</div>
+      <div class="ob-sub">냉동실에 얼리면 더 선명한 소리!<br>향 바꾸기로 색깔도 바꿔봐요 🎨</div>
+      <button class="ob-btn" onclick="obNext()">다음 →</button>
+    </div>
+    <!-- Step 3 -->
+    <div class="ob-step" id="ob3">
+      <div class="ob-emoji">💚</div>
+      <div class="ob-title">슬랑이</div>
+      <div class="ob-sub">흰 부분 = 와사삭 ❄️<br>연두 부분 = 쫀득 💚<br>두 질감이 달라요!</div>
+      <button class="ob-btn" onclick="dismissOnboarding()">시작!</button>
+    </div>
+    <!-- Dots -->
+    <div class="ob-dots">
+      <div class="ob-dot on" id="od1"></div>
+      <div class="ob-dot" id="od2"></div>
+      <div class="ob-dot" id="od3"></div>
+    </div>
   </div>
 </div>
 
@@ -287,6 +348,8 @@ h1{
 
 <div class="controls">
   <button class="btn btn-freeze" id="freezeBtn" onclick="toggleFreeze()">❄️ 냉동실</button>
+  <button class="btn btn-slang" id="slangBtn" onclick="toggleSlang()">🫧 슬랑이<span class="new-badge">NEW</span></button>
+  <button class="btn btn-slang-color theme-green" id="slangColorBtn" onclick="cycleSlangColor()">🟢 연두</button>
   <button class="btn btn-flavor" onclick="openPop()">🎨 향 바꾸기</button>
   <button class="btn btn-reset" onclick="resetBall()">🔄 새 왁뿌볼</button>
 </div>
@@ -315,8 +378,8 @@ const FLAVORS=[
   {name:'🫐 블루베리',wax:['#c0d4ff','#3c6fcd','#2450a0'],mal:['#ffd0b8','#ff8850','#d04818'],unlock:35},
 ];
 
-// ── STREAK TIMEOUT (30초 안에 안 뿌시면 리셋) ──────────────────
-const STREAK_TIMEOUT_MS = 30000;
+// ── STREAK TIMEOUT (60초 안에 안 뿌시면 리셋) ──────────────────
+const STREAK_TIMEOUT_MS = 60000;
 
 // ── localStorage 저장/로드 ────────────────────────────────────
 function saveState(){
@@ -325,6 +388,7 @@ function saveState(){
       crackCount,
       unlocked,
       currentFlavor,
+      slangUsed,
       lastCrackTime: Date.now()
     }));
   }catch(e){}
@@ -346,11 +410,78 @@ function loadState(){
     if(!unlocked[currentFlavor]) currentFlavor=0;
     WAX  = FLAVORS[currentFlavor].wax;
     MALANG = FLAVORS[currentFlavor].mal;
+    if(s.slangUsed) slangUsed=true;
   }catch(e){}
 }
 
 // ── STATE ──────────────────────────────────────────────────────
 let crackCount=0,isFrozen=false,crackLevel=0,isCracking=false;
+let isSlang=false; // 슬랑이 모드
+let slangUsed=false; // 슬랑이를 한 번이라도 써봤는지
+let icebarCrackLevel=0; // 슬랑이 아이스바 전용 크랙
+let icebarCrackPoly=null;
+// ── 슬랑이 색깔 테마 ──────────────────────────────────────────
+const SLANG_THEMES=[
+  {
+    id:'green', label:'🟢 연두',
+    // 젤리 레이어 그라디언트 색상
+    jelly:['rgba(220,252,175,','rgba(190,235,125,','rgba(158,215,95,','rgba(122,188,68,','rgba(88,158,42,'],
+    // 젤리 엣지 오버레이
+    edge:['rgba(175,232,115,0.0)','rgba(152,215,88,0.05)','rgba(125,195,65,0.18)','rgba(95,168,42,0.42)'],
+    // 젤리 크랙 색상
+    crackMain:'rgba(80,140,40,',crackHL:'rgba(195,245,140,',
+    // 샤베트 글로우/내부 결
+    shGrain:'rgba(200,235,195,1)',shGlow2:'rgba(232,255,210,',
+    // 파티클 jelly 색상
+    pJelly:['rgba(185,238,120,0.88)','rgba(165,220,95,0.84)','rgba(210,248,155,0.86)','rgba(140,205,80,0.82)'],
+    pGlitter:['rgba(200,230,180,0.90)','rgba(220,245,200,0.88)','rgba(255,255,240,0.92)'],
+    // 그림자
+    shadow:'rgba(80,160,60,0.20)',
+    // hold ring
+    ring:'#34d399',
+  },
+  {
+    id:'sky', label:'🔵 하늘',
+    jelly:['rgba(186,230,255,','rgba(125,211,252,','rgba(56,189,248,','rgba(14,165,233,','rgba(2,132,199,'],
+    edge:['rgba(147,210,255,0.0)','rgba(125,200,248,0.05)','rgba(90,175,230,0.18)','rgba(50,140,200,0.42)'],
+    crackMain:'rgba(10,100,160,',crackHL:'rgba(186,238,255,',
+    shGrain:'rgba(185,220,245,1)',shGlow2:'rgba(210,240,255,',
+    pJelly:['rgba(125,211,252,0.88)','rgba(56,189,248,0.84)','rgba(186,230,255,0.86)','rgba(14,165,233,0.82)'],
+    pGlitter:['rgba(180,220,255,0.90)','rgba(200,235,255,0.88)','rgba(240,250,255,0.92)'],
+    shadow:'rgba(14,120,200,0.20)',
+    ring:'#38bdf8',
+  },
+  {
+    id:'pink', label:'🩷 분홍',
+    jelly:['rgba(255,213,230,','rgba(249,168,212,','rgba(236,72,153,','rgba(219,39,119,','rgba(190,24,93,'],
+    edge:['rgba(249,168,212,0.0)','rgba(236,130,190,0.05)','rgba(210,80,150,0.18)','rgba(180,30,100,0.42)'],
+    crackMain:'rgba(160,20,80,',crackHL:'rgba(255,200,230,',
+    shGrain:'rgba(245,195,220,1)',shGlow2:'rgba(255,220,240,',
+    pJelly:['rgba(249,168,212,0.88)','rgba(236,72,153,0.84)','rgba(255,182,228,0.86)','rgba(219,39,119,0.82)'],
+    pGlitter:['rgba(255,200,230,0.90)','rgba(255,220,240,0.88)','rgba(255,240,250,0.92)'],
+    shadow:'rgba(200,30,100,0.20)',
+    ring:'#f472b6',
+  },
+  {
+    id:'yellow', label:'🟡 연노랑',
+    jelly:['rgba(254,249,195,','rgba(253,224,71,','rgba(234,179,8,','rgba(202,138,4,','rgba(161,98,7,'],
+    edge:['rgba(253,230,100,0.0)','rgba(240,210,50,0.05)','rgba(210,170,10,0.18)','rgba(170,120,5,0.42)'],
+    crackMain:'rgba(130,90,0,',crackHL:'rgba(254,249,195,',
+    shGrain:'rgba(245,230,150,1)',shGlow2:'rgba(255,248,200,',
+    pJelly:['rgba(253,224,71,0.88)','rgba(234,179,8,0.84)','rgba(254,249,195,0.86)','rgba(202,138,4,0.82)'],
+    pGlitter:['rgba(255,240,150,0.90)','rgba(255,248,180,0.88)','rgba(255,255,220,0.92)'],
+    shadow:'rgba(170,120,0,0.20)',
+    ring:'#facc15',
+  },
+];
+let slangColorIdx=0; // 현재 색깔 인덱스
+let slangSherbetPos={x:130,y:112,r:65};
+let _slangGlitter=null;
+let jellyCrackLevel=0;   // 젤리 레이어 크랙 (쫀득쫀득)
+let sherbetCrackLevel=0; // 샤베트 레이어 크랙 (와사삭)
+let pressOnSherbet=false; // 현재 누르는 곳이 샤베트인지
+let jellyCrackPoly=null;
+let sherbetCrackPoly=null;
 let audioCtx=null;
 let pressX=130,pressY=130,pressFactor=0,isPressingDown=false;
 let holdRafId=null,pressStart=0,holdProgress=0,lastCrackAt=0;
@@ -384,6 +515,11 @@ const RING_CIRC=2*Math.PI*128;
 // 저장된 카운트 반영
 cntEl.textContent=crackCount;
 streakEl.textContent=streakCount;
+
+// 슬랑이 이미 써봤으면 NEW 뱃지 제거
+if(slangUsed){
+  document.getElementById('slangBtn').classList.add('used');
+}
 
 // 향 선택 UI 반영
 document.querySelectorAll('.fi').forEach(f=>f.classList.remove('sel'));
@@ -542,7 +678,738 @@ function drawBall(crackLv,frozen,px,py,pf){
   c.restore();
 }
 
-// ── RANDOMISED CRACK VORONOI ────────────────────────────────────
+// ── SLANG DRAW ─────────────────────────────────────────────────
+// 슬랑이: 실물 사진 기반 — 연두/라임 반투명 젤리 + 크고 뭉실한 흰 샤베트 + 글리터
+// 글리터 위치 캐시 (매 프레임 재생성 방지)
+function genSlangGlitter(){
+  const g=[];
+  // 은별/스타 글리터
+  for(let i=0;i<22;i++){
+    const ang=Math.random()*Math.PI*2;
+    const r=20+Math.random()*88;
+    g.push({type:'star', x:CX+Math.cos(ang)*r, y:CY+Math.sin(ang)*r,
+      size:1.4+Math.random()*3.2, alpha:0.35+Math.random()*0.5,
+      rot:Math.random()*Math.PI});
+  }
+  // 홀로그램 육각/원형 조각
+  for(let i=0;i<14;i++){
+    const ang=Math.random()*Math.PI*2;
+    const r=15+Math.random()*92;
+    const T=SLANG_THEMES[slangColorIdx];
+    const c1=T.pGlitter[0].replace(/,[\d.]+\)$/,',');
+    const c2=T.pGlitter[1].replace(/,[\d.]+\)$/,',');
+    g.push({type:'hex', x:CX+Math.cos(ang)*r, y:CY+Math.sin(ang)*r,
+      size:2.2+Math.random()*4.5, alpha:0.28+Math.random()*0.42,
+      hue:Math.random()<0.5?c1:c2});
+  }
+  // 작은 꽃 모양
+  for(let i=0;i<8;i++){
+    const ang=Math.random()*Math.PI*2;
+    const r=30+Math.random()*78;
+    g.push({type:'flower', x:CX+Math.cos(ang)*r, y:CY+Math.sin(ang)*r,
+      size:2.5+Math.random()*2.8, alpha:0.4+Math.random()*0.35});
+  }
+  return g;
+}
+
+function drawGlitter(glitters){
+  c.save();
+  glitters.forEach(g=>{
+    c.globalAlpha=g.alpha;
+    if(g.type==='star'){
+      // 4점 별
+      c.save();c.translate(g.x,g.y);c.rotate(g.rot);
+      c.strokeStyle='rgba(190,220,190,0.92)';c.lineWidth=0.85;
+      const s=g.size;
+      c.beginPath();c.moveTo(0,-s);c.lineTo(0,s);c.moveTo(-s,0);c.lineTo(s,0);
+      c.moveTo(-s*0.55,-s*0.55);c.lineTo(s*0.55,s*0.55);
+      c.moveTo(s*0.55,-s*0.55);c.lineTo(-s*0.55,s*0.55);
+      c.stroke();
+      c.restore();
+    } else if(g.type==='hex'){
+      // 원형/육각 홀로그램
+      c.beginPath();c.arc(g.x,g.y,g.size,0,Math.PI*2);
+      c.fillStyle=g.hue+'0.72)';c.fill();
+    } else if(g.type==='flower'){
+      // 작은 꽃
+      c.save();c.translate(g.x,g.y);
+      const s=g.size;
+      for(let p=0;p<5;p++){
+        const a=(p/5)*Math.PI*2;
+        c.beginPath();c.arc(Math.cos(a)*s*0.7,Math.sin(a)*s*0.7,s*0.55,0,Math.PI*2);
+        c.fillStyle='rgba(230,255,230,0.7)';c.fill();
+      }
+      c.beginPath();c.arc(0,0,s*0.4,0,Math.PI*2);
+      c.fillStyle='rgba(255,255,255,0.9)';c.fill();
+      c.restore();
+    }
+  });
+  c.globalAlpha=1;
+  c.restore();
+}
+
+function genSlangSherbetPos(){
+  // 샤베트: 중앙보다 약간 위에, 매우 크게 (공의 55~65%)
+  const angle=Math.random()*Math.PI*2;
+  const dist=6+Math.random()*12;
+  slangSherbetPos={
+    x:CX+Math.cos(angle)*dist,
+    y:CY-8+Math.sin(angle)*dist,  // 살짝 위로
+    r:60+Math.random()*10          // 크게!
+  };
+  _slangGlitter=genSlangGlitter();
+  currentCrackPoly=null;
+}
+
+function drawSlang(jellyCrackLv, sherbetCrackLv, px, py, pf){
+  py_last=py;
+  c.clearRect(0,0,W,H);
+  if(!_slangGlitter) _slangGlitter=genSlangGlitter();
+  const T=SLANG_THEMES[slangColorIdx]; // 현재 색깔 테마
+
+  // shadow
+  c.save();
+  c.shadowColor=T.shadow;c.shadowBlur=30;c.shadowOffsetY=12+pf*4;
+  c.beginPath();c.arc(CX,CY+4,R-pf*8,0,Math.PI*2);
+  c.fillStyle='rgba(0,0,0,0.01)';c.fill();
+  c.restore();
+
+  const pts=getBallPath(px,py,pf);
+  c.save();
+  c.beginPath();
+  pts.forEach(([x,y],i)=>i===0?c.moveTo(x,y):c.lineTo(x,y));
+  c.closePath();c.clip();
+
+  // ══ LAYER 1: 젤리 껍질 (테마 색상) ══
+  const jellyAlpha = Math.max(0.18, 0.88 - jellyCrackLv * 0.08);
+  const jg=c.createRadialGradient(CX-18,CY-22,8,CX,CY,R);
+  jg.addColorStop(0,T.jelly[0]+jellyAlpha+')');
+  jg.addColorStop(0.25,T.jelly[1]+jellyAlpha+')');
+  jg.addColorStop(0.55,T.jelly[2]+(jellyAlpha*0.92)+')');
+  jg.addColorStop(0.82,T.jelly[3]+(jellyAlpha*0.88)+')');
+  jg.addColorStop(1,T.jelly[4]+(jellyAlpha*0.95)+')');
+  c.fillStyle=jg;
+  c.globalAlpha=1;
+  c.fillRect(0,0,W,H);
+
+  // 글리터: 젤리 안에 박힌 느낌 (젤리 크랙시 더 선명하게 보임)
+  c.globalAlpha=0.55+jellyCrackLv*0.04;
+  drawGlitter(_slangGlitter);
+  c.globalAlpha=1;
+
+  // ══ LAYER 2: 흰 샤베트 덩어리 (얼음 느낌, 크고 선명하게) ══
+  const {x:sx,y:sy,r:sr}=slangSherbetPos;
+  const shBreak = Math.min(1, sherbetCrackLv / 8);
+  const shAlpha = Math.max(0.12, 0.96 - sherbetCrackLv * 0.06);
+
+  // 샤베트 외곽 소프트 glow (얼음 빛 산란)
+  const shGlow=c.createRadialGradient(sx-sr*0.08,sy-sr*0.12,sr*0.04,sx,sy,sr*1.5);
+  shGlow.addColorStop(0,'rgba(255,255,255,0.65)');
+  shGlow.addColorStop(0.38,'rgba(245,255,242,0.28)');
+  shGlow.addColorStop(0.72,'rgba(230,248,225,0.10)');
+  shGlow.addColorStop(1,'rgba(210,240,205,0)');
+  c.fillStyle=shGlow;
+  c.globalAlpha=shAlpha*0.80;
+  c.fillRect(0,0,W,H);
+  c.globalAlpha=1;
+
+  // 샤베트 본체: 크랙 레벨에 따라 조각이 분리
+  c.save();
+  const numChunks = sherbetCrackLv<2?1:(sherbetCrackLv<4?2:sherbetCrackLv<6?3:5);
+  const chunkOffsets=[
+    [0,0],
+    [sr*0.22*shBreak, -sr*0.14*shBreak],
+    [-sr*0.24*shBreak,  sr*0.18*shBreak],
+    [ sr*0.32*shBreak,  sr*0.26*shBreak],
+    [-sr*0.18*shBreak, -sr*0.28*shBreak],
+  ];
+  const chunkScales=[1.0, 0.55, 0.50, 0.40, 0.36];
+
+  for(let ci=0;ci<numChunks;ci++){
+    const [ox,oy]=chunkOffsets[ci]||[0,0];
+    const chunkR = sr * (chunkScales[ci]||0.35) * (1 - shBreak*0.16);
+    const csx=sx+ox, csy=sy+oy;
+
+    // 중심 순백 → 가장자리 반투명 (얼음 덩어리 느낌)
+    const shg=c.createRadialGradient(
+      csx-chunkR*0.20, csy-chunkR*0.26, chunkR*0.02,
+      csx, csy, chunkR
+    );
+    shg.addColorStop(0, 'rgba(255,255,255,1.0)');
+    shg.addColorStop(0.28,'rgba(252,255,250,0.98)');
+    shg.addColorStop(0.58,'rgba(242,252,240,0.90)');
+    shg.addColorStop(0.82,'rgba(225,245,220,0.60)');
+    shg.addColorStop(1,  'rgba(205,238,200,0.06)');
+    c.fillStyle=shg;
+    c.globalAlpha=shAlpha*(ci===0?1.0:0.84);
+
+    // 뭉게구름 윤곽
+    c.beginPath();
+    const blobs=ci===0?14:9;
+    for(let i=0;i<=blobs;i++){
+      const ang=(i/blobs)*Math.PI*2;
+      const w1=1 + 0.20*Math.sin(ang*2.1+1.0+ci*0.8);
+      const w2=   0.10*Math.cos(ang*3.8+0.6+ci*1.4);
+      const w3=   0.06*Math.sin(ang*5.3+2.0+ci*1.0);
+      const br=chunkR*(w1+w2+w3);
+      i===0?c.moveTo(csx+Math.cos(ang)*br,csy+Math.sin(ang)*br)
+           :c.lineTo(csx+Math.cos(ang)*br,csy+Math.sin(ang)*br);
+    }
+    c.closePath();c.fill();
+    c.globalAlpha=1;
+
+    // 샤베트 내부 미세 결 (얼음 질감 — 크랙 없을때만)
+    if(ci===0 && sherbetCrackLv<3){
+      const T=SLANG_THEMES[slangColorIdx];
+      c.globalAlpha=0.22;
+      c.strokeStyle=T.shGrain;
+      c.lineWidth=0.7;
+      for(let k=0;k<8;k++){
+        const ka=(k/8)*Math.PI*2+0.4;
+        const klen=chunkR*(0.32+k*0.045);
+        c.beginPath();
+        c.moveTo(csx+Math.cos(ka)*chunkR*0.08, csy+Math.sin(ka)*chunkR*0.08);
+        c.lineTo(csx+Math.cos(ka)*klen, csy+Math.sin(ka)*klen);
+        c.stroke();
+      }
+      c.globalAlpha=1;
+    }
+  }
+  c.restore();
+
+  // ══ 젤리 가장자리 두께감 오버레이 ══
+  const jellyEdge=c.createRadialGradient(CX,CY,R*0.32,CX,CY,R);
+  jellyEdge.addColorStop(0,T.edge[0]);
+  jellyEdge.addColorStop(0.58,T.edge[1]);
+  jellyEdge.addColorStop(0.80,T.edge[2]);
+  jellyEdge.addColorStop(1,T.edge[3]);
+  c.fillStyle=jellyEdge;
+  c.globalAlpha=0.88;
+  c.fillRect(0,0,W,H);
+  c.globalAlpha=1;
+
+  // dimple shading
+  if(pf>0.04){
+    const pdx2=px-CX,pdy2=py-CY,pd=Math.sqrt(pdx2*pdx2+pdy2*pdy2)||1;
+    const pu=[pdx2/pd,pdy2/pd];
+    const dc=Math.min(pd,R*0.8);
+    const dentX=CX+pu[0]*dc*0.7,dentY=CY+pu[1]*dc*0.7;
+    const dentR=36*pf+8;
+    const dg=c.createRadialGradient(dentX,dentY,0,dentX,dentY,dentR);
+    dg.addColorStop(0,`rgba(0,0,0,${0.18*pf})`);
+    dg.addColorStop(0.5,`rgba(0,0,0,${0.07*pf})`);
+    dg.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=dg;c.fillRect(0,0,W,H);
+  }
+
+  // ══ 크랙 레이어별 렌더링 ══
+  // 젤리 크랙: 연두색 표면에 늘어나는 실금 (쫀득 느낌)
+  if(jellyCrackLv>0) drawJellyCracks(jellyCrackLv);
+  // 샤베트 크랙: 흰 덩어리 위에 날카로운 얼음 균열
+  if(sherbetCrackLv>0) drawSherbetCracks(sherbetCrackLv);
+
+  // shine
+  const pdx3=px-CX,pdy3=py-CY,pd3=Math.sqrt(pdx3*pdx3+pdy3*pdy3)||1;
+  const sOx=pf>0?(pdx3/pd3)*(-10*pf):0,sOy=pf>0?(pdy3/pd3)*(-10*pf):0;
+  const sg=c.createRadialGradient(CX-38+sOx,CY-44+sOy,2,CX-7+sOx,CY-9+sOy,R*0.50);
+  sg.addColorStop(0,'rgba(255,255,255,0.90)');
+  sg.addColorStop(0.16,'rgba(255,255,255,0.30)');
+  sg.addColorStop(0.42,'rgba(255,255,255,0.05)');
+  sg.addColorStop(1,'rgba(255,255,255,0)');
+  c.fillStyle=sg;c.fillRect(0,0,W,H);
+
+  const sg2=c.createRadialGradient(CX+32,CY+38,0,CX+24,CY+30,R*0.34);
+  sg2.addColorStop(0,T.shGlow2+'0.18)');
+  sg2.addColorStop(1,T.shGlow2+'0)');
+  c.fillStyle=sg2;c.fillRect(0,0,W,H);
+
+  c.restore();
+}
+
+// ══ 슬랑이 아이스바 드로우 ══════════════════════════════════════
+// isSlang && isFrozen 일 때: 전체가 꽁꽁 얼어붙은 샤베트 덩어리
+function drawSlangIcebar(crackLv, px, py, pf){
+  py_last=py;
+  c.clearRect(0,0,W,H);
+  const T=SLANG_THEMES[slangColorIdx];
+
+  // shadow — 얼음 그림자, 파란 기운
+  c.save();
+  c.shadowColor='rgba(14,120,200,0.22)';c.shadowBlur=32;c.shadowOffsetY=14+pf*4;
+  c.beginPath();c.arc(CX,CY+4,R-pf*8,0,Math.PI*2);
+  c.fillStyle='rgba(0,0,0,0.01)';c.fill();
+  c.restore();
+
+  const pts=getBallPath(px,py,pf);
+  c.save();
+  c.beginPath();
+  pts.forEach(([x,y],i)=>i===0?c.moveTo(x,y):c.lineTo(x,y));
+  c.closePath();c.clip();
+
+  // ── BASE: 테마 색상 + 얼음 파란 오버레이 ──
+  // 젤리 색상이 얼음에 갇혀 더 진하고 불투명하게
+  const bg=c.createRadialGradient(CX-20,CY-24,6,CX,CY,R);
+  bg.addColorStop(0,  T.jelly[0]+'1.0)');
+  bg.addColorStop(0.30,T.jelly[1]+'0.96)');
+  bg.addColorStop(0.62,T.jelly[2]+'0.92)');
+  bg.addColorStop(0.88,T.jelly[3]+'0.98)');
+  bg.addColorStop(1,  T.jelly[4]+'1.0)');
+  c.fillStyle=bg;c.fillRect(0,0,W,H);
+
+  // 얼음 파란 오버레이 (냉기 느낌)
+  const iceOv=c.createRadialGradient(CX+18,CY-20,8,CX,CY,R);
+  iceOv.addColorStop(0,'rgba(210,240,255,0.22)');
+  iceOv.addColorStop(0.45,'rgba(180,220,255,0.30)');
+  iceOv.addColorStop(0.80,'rgba(140,195,240,0.38)');
+  iceOv.addColorStop(1,'rgba(80,150,220,0.52)');
+  c.fillStyle=iceOv;c.fillRect(0,0,W,H);
+
+  // ── 전체 샤베트 텍스처: 크고 뭉실한 흰 덩어리 여러 개 ──
+  // 아이스바는 전체가 샤베트 — 구체적으로 7~9개 조각이 공 전체를 덮음
+  const chunks=[
+    {x:CX,    y:CY-10, r:68},
+    {x:CX-38, y:CY+20, r:48},
+    {x:CX+40, y:CY+18, r:44},
+    {x:CX+10, y:CY+52, r:38},
+    {x:CX-42, y:CY-30, r:36},
+    {x:CX+44, y:CY-28, r:32},
+    {x:CX-8,  y:CY-58, r:28},
+  ];
+  const breakAmt=Math.min(1, crackLv/9);
+  const breakDirs=[[0,0],[-.18,.14],[.20,-.12],[.08,.22],[-.22,-.18],[.24,.10],[-.10,-.24]];
+
+  chunks.forEach((ch,ci)=>{
+    const [bdx,bdy]=breakDirs[ci]||[0,0];
+    const ox=bdx*R*breakAmt, oy=bdy*R*breakAmt;
+    const csx=ch.x+ox, csy=ch.y+oy;
+    const chR=ch.r*(1-breakAmt*0.12);
+
+    const shg=c.createRadialGradient(
+      csx-chR*0.22, csy-chR*0.28, chR*0.02,
+      csx, csy, chR
+    );
+    shg.addColorStop(0,'rgba(255,255,255,1.0)');
+    shg.addColorStop(0.22,'rgba(250,253,255,0.98)');
+    shg.addColorStop(0.52,'rgba(232,246,255,0.88)');
+    shg.addColorStop(0.80,'rgba(210,235,255,0.55)');
+    shg.addColorStop(1,'rgba(180,215,250,0.04)');
+    c.fillStyle=shg;
+    c.globalAlpha=Math.max(0.15, 0.94-crackLv*0.05)*(ci===0?1.0:0.82);
+
+    // 뭉글뭉글 윤곽
+    c.beginPath();
+    const blobs=ci===0?14:9;
+    for(let i=0;i<=blobs;i++){
+      const ang=(i/blobs)*Math.PI*2;
+      const w1=1+0.22*Math.sin(ang*2.3+ci*0.9+1.1);
+      const w2=  0.11*Math.cos(ang*3.6+ci*1.5+0.5);
+      const w3=  0.06*Math.sin(ang*5.1+ci*0.7+2.2);
+      const br=chR*(w1+w2+w3);
+      i===0?c.moveTo(csx+Math.cos(ang)*br, csy+Math.sin(ang)*br)
+           :c.lineTo(csx+Math.cos(ang)*br, csy+Math.sin(ang)*br);
+    }
+    c.closePath();c.fill();
+    c.globalAlpha=1;
+
+    // 얼음 내부 결정 결 (작은 방사형 선)
+    if(crackLv<4){
+      c.save();
+      c.globalAlpha=0.18-crackLv*0.02;
+      c.strokeStyle='rgba(200,230,255,1)';
+      c.lineWidth=0.65;
+      for(let k=0;k<6;k++){
+        const ka=(k/6)*Math.PI*2+ci*0.5;
+        const klen=chR*(0.28+k*0.055);
+        c.beginPath();
+        c.moveTo(csx+Math.cos(ka)*chR*0.06, csy+Math.sin(ka)*chR*0.06);
+        c.lineTo(csx+Math.cos(ka)*klen, csy+Math.sin(ka)*klen);
+        c.stroke();
+      }
+      c.restore();
+    }
+  });
+
+  // ── 서리 결정 (전체 표면) ──
+  drawFrost(0.55 + crackLv*0.04);
+
+  // ── 얼음 표면 광택 오버레이 ──
+  const surfGlow=c.createRadialGradient(CX-8,CY-12,R*0.1,CX,CY,R*0.88);
+  surfGlow.addColorStop(0,'rgba(200,235,255,0.20)');
+  surfGlow.addColorStop(0.5,'rgba(160,210,250,0.08)');
+  surfGlow.addColorStop(1,'rgba(120,180,240,0.22)');
+  c.fillStyle=surfGlow;c.fillRect(0,0,W,H);
+
+  // ── 크랙 ──
+  if(crackLv>0) drawIcebarCracks(crackLv,px,py);
+
+  // dimple shading
+  if(pf>0.04){
+    const pdx2=px-CX,pdy2=py-CY,pd=Math.sqrt(pdx2*pdx2+pdy2*pdy2)||1;
+    const pu=[pdx2/pd,pdy2/pd];
+    const dc=Math.min(pd,R*0.8);
+    const dentX=CX+pu[0]*dc*0.7,dentY=CY+pu[1]*dc*0.7;
+    const dentR=36*pf+8;
+    const dg=c.createRadialGradient(dentX,dentY,0,dentX,dentY,dentR);
+    dg.addColorStop(0,`rgba(0,0,0,${0.14*pf})`);
+    dg.addColorStop(0.5,`rgba(0,0,0,${0.05*pf})`);
+    dg.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=dg;c.fillRect(0,0,W,H);
+  }
+
+  // shine — 얼음 반사광 (더 날카롭게)
+  const pdx3=px-CX,pdy3=py-CY,pd3=Math.sqrt(pdx3*pdx3+pdy3*pdy3)||1;
+  const sOx=pf>0?(pdx3/pd3)*(-8*pf):0,sOy=pf>0?(pdy3/pd3)*(-8*pf):0;
+  const sg=c.createRadialGradient(CX-38+sOx,CY-44+sOy,1,CX-6+sOx,CY-8+sOy,R*0.44);
+  sg.addColorStop(0,'rgba(255,255,255,0.96)');
+  sg.addColorStop(0.14,'rgba(220,240,255,0.38)');
+  sg.addColorStop(0.38,'rgba(200,230,255,0.06)');
+  sg.addColorStop(1,'rgba(255,255,255,0)');
+  c.fillStyle=sg;c.fillRect(0,0,W,H);
+
+  // 보조 하이라이트 (얼음 모서리 반사)
+  const sg2=c.createRadialGradient(CX+48,CY+42,0,CX+36,CY+32,R*0.30);
+  sg2.addColorStop(0,'rgba(180,220,255,0.22)');
+  sg2.addColorStop(1,'rgba(180,220,255,0)');
+  c.fillStyle=sg2;c.fillRect(0,0,W,H);
+
+  c.restore();
+}
+
+// ── 아이스바 크랙: 유리처럼 날카롭고 직선적인 균열 ─────────────
+function genIcebarCrackPoly(){
+  const lines=[];
+  const n=8+Math.floor(Math.random()*4);
+  for(let i=0;i<n;i++){
+    const ang=Math.random()*Math.PI*2;
+    const startR=R*(0.02+Math.random()*0.10);
+    const endR=R*(0.72+Math.random()*0.30);
+    const w=(Math.random()-0.5)*0.18; // 거의 직선 (얼음 특성)
+    lines.push({pts:[
+      [CX+Math.cos(ang)*startR, CY+Math.sin(ang)*startR],
+      [CX+Math.cos(ang+w)*endR*0.5, CY+Math.sin(ang+w)*endR*0.5],
+      [CX+Math.cos(ang+w*1.5)*endR, CY+Math.sin(ang+w*1.5)*endR]
+    ]});
+    // 교차 균열 — 아이스바는 격자 패턴처럼 깨짐
+    if(Math.random()>0.35){
+      const brAng=ang+Math.PI/2+(Math.random()-0.5)*0.4;
+      const midR=R*(0.25+Math.random()*0.30);
+      const brEnd=R*(0.30+Math.random()*0.45);
+      const startMid=[CX+Math.cos(ang)*midR, CY+Math.sin(ang)*midR];
+      lines.push({pts:[
+        startMid,
+        [CX+Math.cos(brAng)*brEnd*0.5, CY+Math.sin(brAng)*brEnd*0.5],
+        [CX+Math.cos(brAng)*brEnd, CY+Math.sin(brAng)*brEnd]
+      ]});
+    }
+  }
+  return lines;
+}
+
+function drawIcebarCracks(lv, px, py){
+  if(!icebarCrackPoly) icebarCrackPoly=genIcebarCrackPoly();
+  const n=Math.min(lv*2, icebarCrackPoly.length);
+  const T=SLANG_THEMES[slangColorIdx];
+  c.save();c.lineCap='round';c.lineJoin='round';
+  for(let i=0;i<n;i++){
+    const cr=icebarCrackPoly[i];
+    // 얼음 크랙: 어두운 파란 선 + 흰 하이라이트
+    c.beginPath();
+    c.moveTo(cr.pts[0][0],cr.pts[0][1]);
+    for(let j=1;j<cr.pts.length;j++) c.lineTo(cr.pts[j][0],cr.pts[j][1]);
+    c.strokeStyle=`rgba(60,120,200,${0.52+i*0.025})`;
+    c.lineWidth=i<4?2.0:1.2;
+    c.shadowColor='rgba(30,80,180,0.4)';c.shadowBlur=3;
+    c.stroke();
+    // 하이라이트 (얼음 균열 빛 반사)
+    c.strokeStyle=`rgba(220,240,255,${0.70+i*0.02})`;
+    c.lineWidth=i<4?0.8:0.4;
+    c.shadowBlur=0;
+    c.stroke();
+  }
+  c.restore();
+}
+
+// ── 아이스바 전용 사운드: 아삭아삭 얼음 결정 연속 파쇄 ──────────
+// 샤베트Crunch보다 훨씬 바삭하고 건조, 더 고음, 더 많은 클릭 연타
+function playIcebarCrunch(intensity){
+  const ac=getAC(), now=ac.currentTime;
+  const master=ac.createDynamicsCompressor();
+  master.threshold.value=-3; master.knee.value=1.5;
+  master.ratio.value=7;     master.attack.value=0.0003;
+  master.release.value=0.03;master.connect(ac.destination);
+
+  // A. 아삭 핵심: 초고음 얼음 결정 연타 (8~12개, 간격 불규칙)
+  const numClicks=8+Math.floor(intensity*5);
+  for(let k=0;k<numClicks;k++){
+    const clickLen=Math.floor(ac.sampleRate*0.012); // 12ms 극단 짧음
+    const cBuf=ac.createBuffer(2,clickLen,ac.sampleRate);
+    for(let ch=0;ch<2;ch++){
+      const d=cBuf.getChannelData(ch);
+      for(let i=0;i<clickLen;i++){
+        const tt=i/ac.sampleRate;
+        const env=tt<0.0006?tt/0.0006:Math.exp(-(tt-0.0006)*280);
+        d[i]=(Math.random()*2-1)*env*(ch===0?1:0.86+Math.random()*0.12);
+      }
+    }
+    const cSrc=ac.createBufferSource();cSrc.buffer=cBuf;
+    const cHP=ac.createBiquadFilter();cHP.type='highpass';cHP.frequency.value=5500+k*300;
+    const cPK=ac.createBiquadFilter();cPK.type='peaking'; cPK.frequency.value=7000+k*500;cPK.Q.value=1.4;cPK.gain.value=14;
+    const cG=ac.createGain();cG.gain.value=(1.0-k*0.06)*intensity;
+    cSrc.connect(cHP);cHP.connect(cPK);cPK.connect(cG);cG.connect(master);
+    cSrc.start(now+k*0.010+Math.random()*0.005);
+  }
+
+  // B. 아삭 표면 마찰: 매우 건조하고 고음 (서걱 아닌 아삭)
+  const scrLen=Math.floor(ac.sampleRate*0.04);
+  const scrBuf=ac.createBuffer(2,scrLen,ac.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const d=scrBuf.getChannelData(ch);
+    for(let i=0;i<scrLen;i++){
+      const tt=i/ac.sampleRate;
+      const env=tt<0.002?tt/0.002:Math.exp(-(tt-0.002)*55);
+      const mod=0.5+0.5*Math.sin(tt*2800); // 더 빠른 변조 = 더 아삭
+      d[i]=(Math.random()*2-1)*env*mod*(ch===0?1:0.92);
+    }
+  }
+  const scrSrc=ac.createBufferSource();scrSrc.buffer=scrBuf;
+  const scrHP=ac.createBiquadFilter();scrHP.type='highpass';scrHP.frequency.value=7000;
+  const scrLP=ac.createBiquadFilter();scrLP.type='lowpass'; scrLP.frequency.value=16000;
+  const scrG=ac.createGain();scrG.gain.value=0.6*intensity;
+  scrSrc.connect(scrHP);scrHP.connect(scrLP);scrLP.connect(scrG);scrG.connect(master);
+  scrSrc.start(now+0.005);
+
+  // C. 얼음 충격 임팩트 (매우 짧고 날카롭게 — 아이스바 특유의 딱!)
+  const impOsc=ac.createOscillator();impOsc.type='sine';
+  impOsc.frequency.setValueAtTime(180,now);
+  impOsc.frequency.exponentialRampToValueAtTime(75,now+0.025);
+  const impG=ac.createGain();
+  impG.gain.setValueAtTime(0,now);
+  impG.gain.linearRampToValueAtTime(0.45*intensity,now+0.001);
+  impG.gain.exponentialRampToValueAtTime(0.001,now+0.03);
+  impOsc.connect(impG);impG.connect(master);
+  impOsc.start(now);impOsc.stop(now+0.035);
+}
+
+// 아이스바 최종 폭발: 와장창! 얼음 전체 박살
+function playIcebarBurst(intensity){
+  const ac=getAC(), now=ac.currentTime;
+  const master=ac.createDynamicsCompressor();
+  master.threshold.value=-2; master.knee.value=1;
+  master.ratio.value=8;     master.attack.value=0.0003;
+  master.release.value=0.04;master.connect(ac.destination);
+
+  // 아삭 클릭 대량 (15~18개)
+  const numClicks=15+Math.floor(intensity*5);
+  for(let k=0;k<numClicks;k++){
+    const cLen=Math.floor(ac.sampleRate*0.013);
+    const cBuf=ac.createBuffer(2,cLen,ac.sampleRate);
+    for(let ch=0;ch<2;ch++){
+      const d=cBuf.getChannelData(ch);
+      for(let i=0;i<cLen;i++){
+        const tt=i/ac.sampleRate;
+        const env=tt<0.0005?tt/0.0005:Math.exp(-(tt-0.0005)*260);
+        d[i]=(Math.random()*2-1)*env*(ch===0?1:0.84+Math.random()*0.14);
+      }
+    }
+    const cSrc=ac.createBufferSource();cSrc.buffer=cBuf;
+    const cHP=ac.createBiquadFilter();cHP.type='highpass';cHP.frequency.value=4800+k*250;
+    const cPK=ac.createBiquadFilter();cPK.type='peaking'; cPK.frequency.value=6800+k*400;cPK.Q.value=1.2;cPK.gain.value=12;
+    const cG=ac.createGain();cG.gain.value=(1.15-k*0.05)*intensity;
+    cSrc.connect(cHP);cHP.connect(cPK);cPK.connect(cG);cG.connect(master);
+    cSrc.start(now+k*0.009+Math.random()*0.005);
+  }
+
+  // 와장창 저역 임팩트
+  const kickOsc=ac.createOscillator();kickOsc.type='sine';
+  kickOsc.frequency.setValueAtTime(200,now);
+  kickOsc.frequency.exponentialRampToValueAtTime(50,now+0.12);
+  const kickG=ac.createGain();
+  kickG.gain.setValueAtTime(0,now);
+  kickG.gain.linearRampToValueAtTime(1.4*intensity,now+0.002);
+  kickG.gain.exponentialRampToValueAtTime(0.001,now+0.18);
+  kickOsc.connect(kickG);kickG.connect(master);
+  kickOsc.start(now);kickOsc.stop(now+0.20);
+
+  // 고음 노이즈 버스트 (얼음 파편 흩어짐)
+  const bLen=Math.floor(ac.sampleRate*0.14);
+  const bBuf=ac.createBuffer(2,bLen,ac.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const d=bBuf.getChannelData(ch);
+    for(let i=0;i<bLen;i++){
+      const tt=i/ac.sampleRate;
+      const env=tt<0.003?tt/0.003:Math.exp(-(tt-0.003)*20);
+      d[i]=(Math.random()*2-1)*env*(ch===0?1:0.88);
+    }
+  }
+  const bSrc=ac.createBufferSource();bSrc.buffer=bBuf;
+  const bHP=ac.createBiquadFilter();bHP.type='highpass';bHP.frequency.value=4000;
+  const bLP=ac.createBiquadFilter();bLP.type='lowpass'; bLP.frequency.value=18000;
+  const bG=ac.createGain();bG.gain.value=1.0*intensity;
+  bSrc.connect(bHP);bHP.connect(bLP);bLP.connect(bG);bG.connect(master);
+  bSrc.start(now+0.005);
+
+  // 유리 링잉 (얼음 파열 후 여운)
+  const ring=ac.createOscillator();ring.type='triangle';
+  ring.frequency.setValueAtTime(7800,now);
+  ring.frequency.exponentialRampToValueAtTime(3200,now+0.22);
+  const ringG=ac.createGain();
+  ringG.gain.setValueAtTime(0.22*intensity,now);
+  ringG.gain.exponentialRampToValueAtTime(0.001,now+0.26);
+  ring.connect(ringG);ringG.connect(master);
+  ring.start(now);ring.stop(now+0.28);
+}
+
+// 아이스바 파티클: 온통 흰 얼음 파편 + 반짝이 + 테마 색 조각
+function spawnIcebarParticles(){
+  const host=document.getElementById('pts');
+  const rect=scene.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  const T=SLANG_THEMES[slangColorIdx];
+  const n=52;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');p.className='pt';
+    const rnd=Math.random();
+    const isIce=rnd>0.28;
+    const isGlitter=rnd<0.18;
+    const sz=isIce?(4+Math.random()*18):isGlitter?(1+Math.random()*3):(3+Math.random()*10);
+    let col,br,aspect;
+    if(isIce){
+      // 흰~하늘 얼음 파편
+      const iceColors=['rgba(255,255,255,0.98)','rgba(220,240,255,0.95)','rgba(200,230,255,0.92)','rgba(240,250,255,0.96)'];
+      col=iceColors[Math.floor(Math.random()*iceColors.length)];
+      br=`${4+Math.random()*14}%`; // 날카로운 모서리
+      aspect=0.35+Math.random()*0.55;
+    } else if(isGlitter){
+      col=T.pGlitter[Math.floor(Math.random()*T.pGlitter.length)];
+      br='50%';aspect=1;
+    } else {
+      col=T.pJelly[Math.floor(Math.random()*T.pJelly.length)];
+      br=`${20+Math.random()*25}%`;
+      aspect=0.6+Math.random()*0.5;
+    }
+    p.style.cssText=`width:${sz}px;height:${sz*aspect}px;left:${cx}px;top:${cy}px;background:${col};border-radius:${br};opacity:1;box-shadow:0 2px 8px rgba(80,160,240,.22);`;
+    host.appendChild(p);
+    const angle=Math.random()*Math.PI*2;
+    const dist=80+Math.random()*200;
+    const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
+    const dur=0.40+Math.random()*0.55;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:1},
+      {transform:`translate(calc(-50% + ${tx}px),calc(-50% + ${ty}px)) scale(0) rotate(${(Math.random()-.5)*320}deg)`,opacity:0}
+    ],{duration:dur*1000,easing:'cubic-bezier(0.08,0,0.55,1)',fill:'forwards'});
+    setTimeout(()=>p.remove(),dur*1000+60);
+  }
+}
+function drawJellyCracks(lv){
+  if(!jellyCrackPoly) jellyCrackPoly=genJellyCrackPoly();
+  const n=Math.min(lv, jellyCrackPoly.length);
+  const T=SLANG_THEMES[slangColorIdx];
+  c.save();c.lineCap='round';c.lineJoin='round';
+  for(let i=0;i<n;i++){
+    const cr=jellyCrackPoly[i];
+    c.beginPath();
+    c.moveTo(cr.pts[0][0],cr.pts[0][1]);
+    for(let j=1;j<cr.pts.length;j++) c.lineTo(cr.pts[j][0],cr.pts[j][1]);
+    c.strokeStyle=T.crackMain+(0.45+i*0.04)+')';
+    c.lineWidth=i<3?2.2:(i<5?1.5:1.0);
+    c.shadowColor=T.crackMain+'0.35)';c.shadowBlur=2;
+    c.stroke();
+    c.strokeStyle=T.crackHL+(0.55+i*0.03)+')';
+    c.lineWidth=i<3?0.9:0.5;
+    c.shadowBlur=0;
+    c.stroke();
+  }
+  c.restore();
+}
+
+function genJellyCrackPoly(){
+  // 젤리 크랙: 공 중심에서 전체 표면으로 퍼짐 (왁스볼처럼)
+  const n=6+Math.floor(Math.random()*3);
+  const lines=[];
+  for(let i=0;i<n;i++){
+    const ang=Math.random()*Math.PI*2;
+    const len=R*(0.62+Math.random()*0.40);
+    const wobble=(Math.random()-0.5)*0.35;
+    lines.push({pts:[
+      [CX, CY],
+      [CX+Math.cos(ang+wobble)*len*0.48, CY+Math.sin(ang+wobble)*len*0.48],
+      [CX+Math.cos(ang)*len, CY+Math.sin(ang)*len]
+    ]});
+    if(Math.random()>0.45){
+      const blen=R*(0.25+Math.random()*0.30);
+      const ba=ang+(Math.random()-0.5)*0.9;
+      const sd=R*(0.25+Math.random()*0.25);
+      lines.push({pts:[
+        [CX+Math.cos(ang)*sd, CY+Math.sin(ang)*sd],
+        [CX+Math.cos(ba)*blen, CY+Math.sin(ba)*blen]
+      ]});
+    }
+  }
+  return lines;
+}
+
+// ══ 샤베트 크랙: 흰 얼음 덩어리 위 날카로운 균열 (와사삭) ══
+function drawSherbetCracks(lv){
+  if(!sherbetCrackPoly) sherbetCrackPoly=genSherbetCrackPoly();
+  const n=Math.min(lv, sherbetCrackPoly.length);
+  const {x:sx,y:sy}=slangSherbetPos;
+  c.save();c.lineCap='round';c.lineJoin='round';
+  for(let i=0;i<n;i++){
+    const cr=sherbetCrackPoly[i];
+    c.beginPath();
+    c.moveTo(cr.pts[0][0],cr.pts[0][1]);
+    for(let j=1;j<cr.pts.length;j++) c.lineTo(cr.pts[j][0],cr.pts[j][1]);
+    // 샤베트 균열: 짙은 회색-파란 그림자 (얼음 단면)
+    c.strokeStyle=`rgba(140,185,140,${0.60+i*0.04})`;
+    c.lineWidth=i<3?2.8:(i<5?1.8:1.1);
+    c.shadowColor='rgba(100,150,90,0.5)';c.shadowBlur=4;
+    c.stroke();
+    // 균열 하이라이트: 순백 (얼음 단면 빛 반사 — 매우 선명)
+    c.strokeStyle=`rgba(255,255,255,${0.90+i*0.01})`;
+    c.lineWidth=i<3?1.2:0.65;
+    c.shadowColor='rgba(220,255,215,0.8)';c.shadowBlur=3;
+    c.stroke();
+    c.shadowBlur=0;
+  }
+  c.restore();
+}
+
+function genSherbetCrackPoly(){
+  // 샤베트 크랙: 샤베트 중심에서 바깥으로 (얼음 깨지듯)
+  const {x:sx,y:sy,r:sr}=slangSherbetPos;
+  const n=8+Math.floor(Math.random()*4);
+  const lines=[];
+  for(let i=0;i<n;i++){
+    const ang=Math.random()*Math.PI*2;
+    const startR=sr*(0.04+Math.random()*0.14);
+    const endR=sr*(0.60+Math.random()*0.65);
+    const w1=(Math.random()-0.5)*0.55;
+    const w2=(Math.random()-0.5)*0.32;
+    lines.push({pts:[
+      [sx+Math.cos(ang)*startR, sy+Math.sin(ang)*startR],
+      [sx+Math.cos(ang+w1)*endR*0.48, sy+Math.sin(ang+w1)*endR*0.48],
+      [sx+Math.cos(ang+w2)*endR, sy+Math.sin(ang+w2)*endR]
+    ]});
+    if(Math.random()>0.28){
+      const midR=sr*(0.30+Math.random()*0.28);
+      const brAng=ang+(Math.random()-0.5)*1.1;
+      const brEnd=sr*(0.22+Math.random()*0.58);
+      lines.push({pts:[
+        [sx+Math.cos(ang)*midR, sy+Math.sin(ang)*midR],
+        [sx+Math.cos(brAng)*brEnd*0.55, sy+Math.sin(brAng)*brEnd*0.55],
+        [sx+Math.cos(brAng)*brEnd, sy+Math.sin(brAng)*brEnd]
+      ]});
+    }
+  }
+  return lines;
+}
+
+// 눌린 위치가 샤베트 영역인지 체크
+function isOnSherbet(px,py){
+  const {x:sx,y:sy,r:sr}=slangSherbetPos;
+  const dx=px-sx,dy=py-sy;
+  return Math.sqrt(dx*dx+dy*dy) < sr*1.05; // 크기에 맞게 조정
+}
 let currentCrackPoly=null;
 function genCrackPoly(){
   const n=5+Math.floor(Math.random()*3);
@@ -842,14 +1709,301 @@ function playMiniSnap(lv){
   shellCrack(ac, master, f2, 85+lv*4, 0.12+lv*0.032, now+0.007);
 }
 
+// ── SLANG SOUNDS ───────────────────────────────────────────────
+//
+// 젤리: 말랑하고 탄성 있는 고무 질감
+//   → 저음 "쪽~" 어택 + 피치 드롭 + 늘어났다 돌아오는 탄성 wobble
+//   → 고음 노이즈 없음. 완전히 부드럽고 촉촉한 소리.
+//
+// 샤베트: 얼음 결정이 부서지는 건조하고 날카로운 소리
+//   → 즉각적인 고음 크런치 연타 (타닥타닥)
+//   → 서걱서걱 마찰 + 얼음 파편 잔향
+//   → 저음 거의 없음. 완전히 딱딱하고 건조한 소리.
+
+// ── 젤리 레이어: 쫀득쫀득 "쪽~" ──────────────────────────────
+function playJellySquish(intensity){
+  const ac=getAC(), now=ac.currentTime;
+  const master=ac.createDynamicsCompressor();
+  master.threshold.value=-6; master.knee.value=6;
+  master.ratio.value=2.5;    master.attack.value=0.002;
+  master.release.value=0.12; master.connect(ac.destination);
+
+  // A. 핵심: 쪽! 저음 임팩트 (180Hz→55Hz 피치드롭 — 탱탱한 젤리 압착)
+  const impOsc=ac.createOscillator(); impOsc.type='sine';
+  impOsc.frequency.setValueAtTime(180,now);
+  impOsc.frequency.exponentialRampToValueAtTime(55,now+0.055);
+  const impDist=ac.createWaveShaper();
+  const dCurve=new Float32Array(256);
+  for(let i=0;i<256;i++) dCurve[i]=Math.tanh((i/128-1)*2.8); // 부드러운 클리핑
+  impDist.curve=dCurve;
+  const impG=ac.createGain();
+  impG.gain.setValueAtTime(0,now);
+  impG.gain.linearRampToValueAtTime(1.1*intensity, now+0.004);
+  impG.gain.exponentialRampToValueAtTime(0.001, now+0.09);
+  impOsc.connect(impDist); impDist.connect(impG); impG.connect(master);
+  impOsc.start(now); impOsc.stop(now+0.1);
+
+  // B. 쫀득 wobble: 눌렸다가 돌아오는 탄성 (사인파 2배음)
+  const wobOsc=ac.createOscillator(); wobOsc.type='sine';
+  wobOsc.frequency.setValueAtTime(95,now+0.010);
+  wobOsc.frequency.exponentialRampToValueAtTime(200, now+0.055); // 올라가며 탄성 복원
+  wobOsc.frequency.exponentialRampToValueAtTime(110, now+0.14);
+  const wobG=ac.createGain();
+  wobG.gain.setValueAtTime(0, now+0.008);
+  wobG.gain.linearRampToValueAtTime(0.45*intensity, now+0.022);
+  wobG.gain.exponentialRampToValueAtTime(0.001, now+0.18);
+  wobOsc.connect(wobG); wobG.connect(master);
+  wobOsc.start(now+0.008); wobOsc.stop(now+0.20);
+
+  // C. 젤리 표면 마찰: 매우 낮은 주파수 노이즈만 (부드럽고 촉촉)
+  const fLen=Math.floor(ac.sampleRate*0.06);
+  const fBuf=ac.createBuffer(1,fLen,ac.sampleRate);
+  const fd=fBuf.getChannelData(0);
+  for(let i=0;i<fLen;i++){
+    const tt=i/ac.sampleRate;
+    fd[i]=(Math.random()*2-1)*Math.exp(-tt*50);
+  }
+  const fSrc=ac.createBufferSource(); fSrc.buffer=fBuf;
+  // 400~900Hz 대역만 — 날카로운 고음 완전 차단
+  const fLP=ac.createBiquadFilter(); fLP.type='lowpass';  fLP.frequency.value=900;
+  const fHP=ac.createBiquadFilter(); fHP.type='highpass'; fHP.frequency.value=200;
+  const fG=ac.createGain(); fG.gain.value=0.22*intensity;
+  fSrc.connect(fLP); fLP.connect(fHP); fHP.connect(fG); fG.connect(master);
+  fSrc.start(now+0.004);
+
+  // D. 탄성 복원 "탕~": 젤리가 원래 모양으로 돌아오는 잔향
+  const springOsc=ac.createOscillator(); springOsc.type='triangle';
+  springOsc.frequency.setValueAtTime(420,now+0.055);
+  springOsc.frequency.exponentialRampToValueAtTime(180,now+0.22);
+  const springLP=ac.createBiquadFilter(); springLP.type='lowpass'; springLP.frequency.value=600;
+  const springG=ac.createGain();
+  springG.gain.setValueAtTime(0, now+0.050);
+  springG.gain.linearRampToValueAtTime(0.32*intensity, now+0.065);
+  springG.gain.exponentialRampToValueAtTime(0.001, now+0.26);
+  springOsc.connect(springLP); springLP.connect(springG); springG.connect(master);
+  springOsc.start(now+0.050); springOsc.stop(now+0.28);
+}
+
+// ── 샤베트 레이어: 얼음 결정 와사삭 ──────────────────────────
+function playSherbetCrunch(intensity){
+  const ac=getAC(), now=ac.currentTime;
+  const master=ac.createDynamicsCompressor();
+  master.threshold.value=-4; master.knee.value=2;
+  master.ratio.value=5;      master.attack.value=0.0005;
+  master.release.value=0.04; master.connect(ac.destination);
+
+  // A. 핵심: 얼음 결정 연타 크런치 (타닥타닥 — 5~7kHz 고음 클릭 연속)
+  // 실제 얼음/샤베트: 매우 빠른 어택(<2ms), 고음 지배, 잔향 없이 즉각 소멸
+  const numClicks=4+Math.floor(intensity*3);
+  for(let k=0;k<numClicks;k++){
+    const clickLen=Math.floor(ac.sampleRate*0.018); // 18ms 극단적으로 짧음
+    const cBuf=ac.createBuffer(2,clickLen,ac.sampleRate);
+    for(let ch=0;ch<2;ch++){
+      const d=cBuf.getChannelData(ch);
+      for(let i=0;i<clickLen;i++){
+        const tt=i/ac.sampleRate;
+        // 즉각 어택(0~1ms) + 초고속 감쇠
+        const env= tt<0.001 ? tt/0.001 : Math.exp(-(tt-0.001)*180);
+        d[i]=(Math.random()*2-1)*env*(ch===0?1:0.88+Math.random()*0.1);
+      }
+    }
+    const cSrc=ac.createBufferSource(); cSrc.buffer=cBuf;
+    // 4kHz~9kHz 대역 부스트 — 얼음 결정 고음
+    const cHP=ac.createBiquadFilter(); cHP.type='highpass';  cHP.frequency.value=3800;
+    const cPK=ac.createBiquadFilter(); cPK.type='peaking';   cPK.frequency.value=5500+k*400; cPK.Q.value=1.2; cPK.gain.value=12;
+    const cLP=ac.createBiquadFilter(); cLP.type='lowpass';   cLP.frequency.value=10000;
+    const cG=ac.createGain(); cG.gain.value=(0.9-k*0.08)*intensity;
+    cSrc.connect(cHP); cHP.connect(cPK); cPK.connect(cLP); cLP.connect(cG); cG.connect(master);
+    cSrc.start(now + k*0.014 + Math.random()*0.004); // 불규칙 간격
+  }
+
+  // B. 얼음 표면 서걱서걱: 짧은 고주파 마찰음
+  const scrLen=Math.floor(ac.sampleRate*0.055);
+  const scrBuf=ac.createBuffer(2,scrLen,ac.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const d=scrBuf.getChannelData(ch);
+    for(let i=0;i<scrLen;i++){
+      const tt=i/ac.sampleRate;
+      // 짧은 어택 후 서서히 감쇠 — 표면 긁히는 느낌
+      const env=tt<0.003?tt/0.003:Math.exp(-(tt-0.003)*28);
+      // 고주파 노이즈에 진폭 변조 걸어서 "서걱" 질감
+      const mod=0.5+0.5*Math.sin(tt*1200);
+      d[i]=(Math.random()*2-1)*env*mod*(ch===0?1:0.90+Math.random()*0.08);
+    }
+  }
+  const scrSrc=ac.createBufferSource(); scrSrc.buffer=scrBuf;
+  const scrHP=ac.createBiquadFilter(); scrHP.type='highpass'; scrHP.frequency.value=5000;
+  const scrLP=ac.createBiquadFilter(); scrLP.type='lowpass';  scrLP.frequency.value=12000;
+  const scrG=ac.createGain(); scrG.gain.value=0.7*intensity;
+  scrSrc.connect(scrHP); scrHP.connect(scrLP); scrLP.connect(scrG); scrG.connect(master);
+  scrSrc.start(now+0.008);
+
+  // C. 얼음 파편 잔향: 깨진 조각들 굴러가는 소리 (고음, 아주 짧게)
+  const tailLen=Math.floor(ac.sampleRate*0.08);
+  const tBuf=ac.createBuffer(2,tailLen,ac.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const d=tBuf.getChannelData(ch);
+    for(let i=0;i<tailLen;i++){
+      const tt=i/ac.sampleRate;
+      d[i]=(Math.random()*2-1)*Math.exp(-tt*55)*(ch===0?1:0.85);
+    }
+  }
+  const tSrc=ac.createBufferSource(); tSrc.buffer=tBuf;
+  const tHP=ac.createBiquadFilter(); tHP.type='highpass'; tHP.frequency.value=4200;
+  const tG=ac.createGain();
+  tG.gain.setValueAtTime(0.35*intensity, now+0.030);
+  tG.gain.exponentialRampToValueAtTime(0.001, now+0.12);
+  tSrc.connect(tHP); tHP.connect(tG); tG.connect(master);
+  tSrc.start(now+0.030);
+
+  // D. 얼음 임팩트 저역: 단 한 방, 매우 짧고 둔탁하게 (얼음 덩어리 충격)
+  // 젤리의 부드러운 저음과 달리 — 뭉툭하고 즉각 소멸
+  const impOsc=ac.createOscillator(); impOsc.type='sine';
+  impOsc.frequency.setValueAtTime(120,now);
+  impOsc.frequency.exponentialRampToValueAtTime(60,now+0.03); // 매우 짧게
+  const impG=ac.createGain();
+  impG.gain.setValueAtTime(0,now);
+  impG.gain.linearRampToValueAtTime(0.55*intensity,now+0.002);
+  impG.gain.exponentialRampToValueAtTime(0.001,now+0.04); // 0.04초만에 소멸
+  impOsc.connect(impG); impG.connect(master);
+  impOsc.start(now); impOsc.stop(now+0.045);
+}
+
+// 샤베트 최종 폭발: 얼음 대량 파쇄 + 저음 충격
+function playSherbetBurst(intensity){
+  const ac=getAC(), now=ac.currentTime;
+  const master=ac.createDynamicsCompressor();
+  master.threshold.value=-3; master.knee.value=2;
+  master.ratio.value=6;      master.attack.value=0.0005;
+  master.release.value=0.05; master.connect(ac.destination);
+
+  // 얼음 대량 파쇄 연타 (8~10개)
+  const numClicks=8+Math.floor(intensity*4);
+  for(let k=0;k<numClicks;k++){
+    const cLen=Math.floor(ac.sampleRate*0.016);
+    const cBuf=ac.createBuffer(2,cLen,ac.sampleRate);
+    for(let ch=0;ch<2;ch++){
+      const d=cBuf.getChannelData(ch);
+      for(let i=0;i<cLen;i++){
+        const tt=i/ac.sampleRate;
+        const env=tt<0.0008?tt/0.0008:Math.exp(-(tt-0.0008)*220);
+        d[i]=(Math.random()*2-1)*env*(ch===0?1:0.85+Math.random()*0.12);
+      }
+    }
+    const cSrc=ac.createBufferSource(); cSrc.buffer=cBuf;
+    const cHP=ac.createBiquadFilter(); cHP.type='highpass'; cHP.frequency.value=3500+k*200;
+    const cPK=ac.createBiquadFilter(); cPK.type='peaking';  cPK.frequency.value=5500+k*350; cPK.Q.value=1.0; cPK.gain.value=10;
+    const cG=ac.createGain(); cG.gain.value=(1.1-k*0.07)*intensity;
+    cSrc.connect(cHP); cHP.connect(cPK); cPK.connect(cG); cG.connect(master);
+    cSrc.start(now + k*0.012 + Math.random()*0.006);
+  }
+
+  // 서걱 마찰 파도
+  const scrLen=Math.floor(ac.sampleRate*0.12);
+  const scrBuf=ac.createBuffer(2,scrLen,ac.sampleRate);
+  for(let ch=0;ch<2;ch++){
+    const d=scrBuf.getChannelData(ch);
+    for(let i=0;i<scrLen;i++){
+      const tt=i/ac.sampleRate;
+      const env=tt<0.005?tt/0.005:Math.exp(-(tt-0.005)*18);
+      const mod=0.5+0.5*Math.sin(tt*800+ch*1.2);
+      d[i]=(Math.random()*2-1)*env*mod;
+    }
+  }
+  const scrSrc=ac.createBufferSource(); scrSrc.buffer=scrBuf;
+  const scrHP=ac.createBiquadFilter(); scrHP.type='highpass'; scrHP.frequency.value=4800;
+  const scrG=ac.createGain(); scrG.gain.value=0.9*intensity;
+  scrSrc.connect(scrHP); scrHP.connect(scrG); scrG.connect(master);
+  scrSrc.start(now+0.005);
+
+  // 얼음 충격 저역 (단 1방, 즉각 소멸)
+  const impOsc=ac.createOscillator(); impOsc.type='sine';
+  impOsc.frequency.setValueAtTime(140,now);
+  impOsc.frequency.exponentialRampToValueAtTime(42,now+0.045);
+  const impG=ac.createGain();
+  impG.gain.setValueAtTime(0,now);
+  impG.gain.linearRampToValueAtTime(1.2*intensity,now+0.002);
+  impG.gain.exponentialRampToValueAtTime(0.001,now+0.055);
+  impOsc.connect(impG); impG.connect(master);
+  impOsc.start(now); impOsc.stop(now+0.06);
+}
+
+// 젤리 최대 압착: 터지지 않고 "쫀득~" 하고 돌아오는 소리
+function playJellyMaxSquish(intensity){
+  const ac=getAC(), now=ac.currentTime;
+  const master=ac.createDynamicsCompressor();
+  master.threshold.value=-6; master.knee.value=6;
+  master.ratio.value=2.5;    master.attack.value=0.002;
+  master.release.value=0.15; master.connect(ac.destination);
+
+  // 최대 압착 저음 임팩트 (더 크고 둔탁하게)
+  const impOsc=ac.createOscillator(); impOsc.type='sine';
+  impOsc.frequency.setValueAtTime(155,now);
+  impOsc.frequency.exponentialRampToValueAtTime(42,now+0.08);
+  const impDist=ac.createWaveShaper();
+  const dc=new Float32Array(256);
+  for(let i=0;i<256;i++) dc[i]=Math.tanh((i/128-1)*3.2);
+  impDist.curve=dc;
+  const impG=ac.createGain();
+  impG.gain.setValueAtTime(0,now);
+  impG.gain.linearRampToValueAtTime(1.3*intensity,now+0.005);
+  impG.gain.exponentialRampToValueAtTime(0.001,now+0.12);
+  impOsc.connect(impDist); impDist.connect(impG); impG.connect(master);
+  impOsc.start(now); impOsc.stop(now+0.14);
+
+  // 크고 탄성있는 wobble (쫀득하게 되돌아오는 느낌)
+  const w1=ac.createOscillator(); w1.type='sine';
+  w1.frequency.setValueAtTime(70,now+0.018);
+  w1.frequency.exponentialRampToValueAtTime(280,now+0.10); // 팡~ 올라가며 복원
+  w1.frequency.exponentialRampToValueAtTime(130,now+0.30);
+  const w1G=ac.createGain();
+  w1G.gain.setValueAtTime(0,now+0.015);
+  w1G.gain.linearRampToValueAtTime(0.7*intensity,now+0.035);
+  w1G.gain.exponentialRampToValueAtTime(0.001,now+0.36);
+  w1.connect(w1G); w1G.connect(master);
+  w1.start(now+0.015); w1.stop(now+0.38);
+
+  // 2차 wobble (쫀득 여운)
+  const w2=ac.createOscillator(); w2.type='triangle';
+  w2.frequency.setValueAtTime(220,now+0.08);
+  w2.frequency.exponentialRampToValueAtTime(95,now+0.35);
+  const w2LP=ac.createBiquadFilter(); w2LP.type='lowpass'; w2LP.frequency.value=500;
+  const w2G=ac.createGain();
+  w2G.gain.setValueAtTime(0,now+0.075);
+  w2G.gain.linearRampToValueAtTime(0.38*intensity,now+0.095);
+  w2G.gain.exponentialRampToValueAtTime(0.001,now+0.42);
+  w2.connect(w2LP); w2LP.connect(w2G); w2G.connect(master);
+  w2.start(now+0.075); w2.stop(now+0.44);
+
+  // 젤리 표면 촉촉한 저주파 마찰 잔향
+  const tLen=Math.floor(ac.sampleRate*0.18);
+  const tBuf=ac.createBuffer(1,tLen,ac.sampleRate);
+  const td=tBuf.getChannelData(0);
+  for(let i=0;i<tLen;i++){
+    const tt=i/ac.sampleRate;
+    td[i]=(Math.random()*2-1)*Math.exp(-tt*14);
+  }
+  const tSrc=ac.createBufferSource(); tSrc.buffer=tBuf;
+  const tLP=ac.createBiquadFilter(); tLP.type='lowpass'; tLP.frequency.value=700;
+  const tG=ac.createGain(); tG.gain.value=0.18*intensity;
+  tSrc.connect(tLP); tLP.connect(tG); tG.connect(master);
+  tSrc.start(now+0.012);
+}
+
 // ── HOLD RING ──────────────────────────────────────────────────
 function updateRing(p){
   const offset=RING_CIRC*(1-p);
   holdRingPath.style.strokeDashoffset=offset;
   if(p>0.01){
-    const g2=Math.round(211-p*80);
-    const b2=Math.round(153-p*100);
-    holdRingPath.style.stroke=`rgba(52,${g2},${Math.max(30,b2)},${0.75+p*0.25})`;
+    if(isSlang){
+      // 슬랑이: 라임/연두 링
+      const g2=Math.round(220-p*60);
+      holdRingPath.style.stroke=`rgba(120,${g2},60,${0.75+p*0.25})`;
+    } else {
+      const g2=Math.round(211-p*80);
+      const b2=Math.round(153-p*100);
+      holdRingPath.style.stroke=`rgba(52,${g2},${Math.max(30,b2)},${0.75+p*0.25})`;
+    }
   } else {
     holdRingPath.style.stroke='rgba(52,211,153,0)';
   }
@@ -859,29 +2013,85 @@ function updateRing(p){
 function holdLoop(){
   if(!isPressingDown){holdRafId=null;return;}
   const elapsed=(performance.now()-pressStart)/1000;
-  const total=isFrozen?0.85:1.55;
-  pressFactor=Math.min(1,elapsed/0.20);
-  holdProgress=Math.min(1,elapsed/total);
-  updateRing(holdProgress);
 
-  const intervals=isFrozen
-    ?[0.14,0.28,0.42,0.55,0.66,0.78,0.88]
-    :[0.16,0.32,0.48,0.62,0.73,0.83,0.91];
-
-  for(let i=0;i<intervals.length;i++){
-    const thr=intervals[i];
-    if(holdProgress>=thr && lastCrackAt<thr && !isCracking){
-      lastCrackAt=thr;
-      if(i===intervals.length-1){triggerFullCrack();return;}
-      crackLevel=i+1;
-      playMiniSnap(crackLevel);
-      if(navigator.vibrate) navigator.vibrate(12);
-      const pre=['꽉 쥐어봐! 👊','금이 가고 있어! 🫧','좀 더! 💪','거의 다 됐어! 😤','터지기 직전! 🔥','으득... 💢','지금이야!! 💥'];
-      setStatus(pre[Math.min(i,pre.length-1)]);
-      spawnParticles(false);
+  if(isSlang && isFrozen){
+    // ── 슬랑이 아이스바: 전체 샤베트, 어디 눌러도 아삭 ──
+    const iceTotal=1.30;
+    pressFactor=Math.min(1, elapsed/0.18);
+    holdProgress=Math.min(1, elapsed/iceTotal);
+    updateRing(holdProgress);
+    const intervals=[0.12,0.24,0.38,0.52,0.64,0.76,0.88];
+    for(let i=0;i<intervals.length;i++){
+      const thr=intervals[i];
+      if(holdProgress>=thr && lastCrackAt<thr && !isCracking){
+        lastCrackAt=thr;
+        if(i===intervals.length-1){triggerFullCrack();return;}
+        icebarCrackLevel=i+1;
+        playIcebarCrunch(0.55+icebarCrackLevel*0.08);
+        if(navigator.vibrate) navigator.vibrate([4,2,8,2,5]);
+        const pre=['❄️ 아삭!','아삭아삭! ❄️','우드득 ❄️','쩍! 금 갔어!','조각나고 있어! 💥','거의 다야!! ❄️','지금이야!! 💥'];
+        setStatus(pre[Math.min(i,pre.length-1)]);
+        spawnSherbetMiniParticles();
+      }
     }
+    drawSlangIcebar(icebarCrackLevel, pressX, pressY, pressFactor);
+
+  } else if(isSlang){
+    const onSherbet=pressOnSherbet;
+
+    if(!onSherbet){
+      // ── 젤리 레이어: 게이지 없음, 크랙 없음, 그냥 눌림만 표현 ──
+      pressFactor=Math.min(0.72, elapsed/0.12); // 0.12초만에 최대 압착
+      drawSlang(0, sherbetCrackLevel, pressX, pressY, pressFactor);
+      holdRafId=requestAnimationFrame(holdLoop);
+      return;
+    }
+
+    // ── 샤베트 레이어: 게이지 끝까지 차고 터짐 ──
+    const sherbetTotal=1.10;
+    pressFactor=Math.min(1, elapsed/0.20);
+    holdProgress=Math.min(1, elapsed/sherbetTotal);
+    updateRing(holdProgress);
+
+    const intervals=[0.14,0.28,0.43,0.57,0.70,0.83,1.00];
+    for(let i=0;i<intervals.length;i++){
+      const thr=intervals[i];
+      if(holdProgress>=thr && lastCrackAt<thr && !isCracking){
+        lastCrackAt=thr;
+        if(i===intervals.length-1){ triggerFullCrack(); return; }
+        sherbetCrackLevel=i+1;
+        playSherbetCrunch(0.45+sherbetCrackLevel*0.09);
+        if(navigator.vibrate) navigator.vibrate([5,3,10,3,6]);
+        const pre=['얼음에 금이...❄️','쩌드득! ❄️','샤베트 갈라져!','쩍쩍! ❄️','조각나고 있어! 💥','거의 다야!! ❄️','지금이야!! 💥'];
+        setStatus(pre[Math.min(i,pre.length-1)]);
+        spawnSherbetMiniParticles();
+      }
+    }
+    drawSlang(jellyCrackLevel, sherbetCrackLevel, pressX, pressY, pressFactor);
+
+  } else {
+    const total=isFrozen?0.85:1.55;
+    pressFactor=Math.min(1,elapsed/0.20);
+    holdProgress=Math.min(1,elapsed/total);
+    updateRing(holdProgress);
+    const intervals=isFrozen
+      ?[0.14,0.28,0.42,0.55,0.66,0.78,0.88]
+      :[0.16,0.32,0.48,0.62,0.73,0.83,0.91];
+    for(let i=0;i<intervals.length;i++){
+      const thr=intervals[i];
+      if(holdProgress>=thr && lastCrackAt<thr && !isCracking){
+        lastCrackAt=thr;
+        if(i===intervals.length-1){triggerFullCrack();return;}
+        crackLevel=i+1;
+        playMiniSnap(crackLevel);
+        if(navigator.vibrate) navigator.vibrate(12);
+        const pre=['꽉 쥐어봐! 👊','금이 가고 있어! 🫧','좀 더! 💪','거의 다 됐어! 😤','터지기 직전! 🔥','으득... 💢','지금이야!! 💥'];
+        setStatus(pre[Math.min(i,pre.length-1)]);
+        spawnParticles(false);
+      }
+    }
+    drawBall(crackLevel,isFrozen,pressX,pressY,pressFactor);
   }
-  drawBall(crackLevel,isFrozen,pressX,pressY,pressFactor);
   holdRafId=requestAnimationFrame(holdLoop);
 }
 
@@ -889,6 +2099,13 @@ function startPress(px,py){
   if(isCracking)return;
   isPressingDown=true;pressX=px;pressY=py;py_last=py;
   pressStart=performance.now();holdProgress=0;lastCrackAt=0;
+  if(isSlang && isFrozen){
+    // 아이스바: 어디든 아삭
+    playIcebarCrunch(0.28);
+  } else if(isSlang){
+    pressOnSherbet=isOnSherbet(px,py);
+    if(!pressOnSherbet) playJellySquish(0.55);
+  }
   cancelAnimationFrame(holdRafId);
   holdRafId=requestAnimationFrame(holdLoop);
 }
@@ -896,14 +2113,22 @@ function startPress(px,py){
 function endPress(){
   if(!isPressingDown)return;
   isPressingDown=false;cancelAnimationFrame(holdRafId);holdRafId=null;
+  if(isSlang && !isFrozen && !pressOnSherbet) playJellySquish(0.42);
   updateRing(0);
   const startF=pressFactor,startT=performance.now();
   function spring(){
     const el=(performance.now()-startT)/1000;
-    pressFactor=Math.max(0,startF*(1-el/0.22));
-    drawBall(crackLevel,isFrozen,pressX,pressY,pressFactor);
+    pressFactor=Math.max(0,startF*(1-el/0.18));
+    if(isSlang && isFrozen) drawSlangIcebar(icebarCrackLevel,pressX,pressY,pressFactor);
+    else if(isSlang) drawSlang(jellyCrackLevel,sherbetCrackLevel,pressX,pressY,pressFactor);
+    else drawBall(crackLevel,isFrozen,pressX,pressY,pressFactor);
     if(pressFactor>0.008)requestAnimationFrame(spring);
-    else{pressFactor=0;drawBall(crackLevel,isFrozen,0,0,0);}
+    else{
+      pressFactor=0;
+      if(isSlang && isFrozen) drawSlangIcebar(icebarCrackLevel,0,0,0);
+      else if(isSlang) drawSlang(jellyCrackLevel,sherbetCrackLevel,0,0,0);
+      else drawBall(crackLevel,isFrozen,0,0,0);
+    }
   }
   requestAnimationFrame(spring);
 }
@@ -930,8 +2155,18 @@ function triggerFullCrack(){
   // 스트릭 타이머 재시작
   resetStreakTimer();
 
-  playWageujeok(isFrozen?1.0:0.85,isFrozen);
-  setTimeout(()=>{showMalang();launchPieces();},42);
+  if(isSlang && isFrozen){
+    // 아이스바: 와장창! 얼음 전체 박살
+    playIcebarBurst(1.0);
+    spawnIcebarParticles();
+  } else if(isSlang){
+    // 슬랑이 일반: 샤베트 레이어 터짐
+    playSherbetBurst(0.95);
+    spawnSlangParticles();
+  } else {
+    playWageujeok(isFrozen?1.0:0.85,isFrozen);
+    setTimeout(()=>{showMalang();launchPieces();},42);
+  }
 
   // shake — 더 강하게
   let sf=0;
@@ -943,14 +2178,22 @@ function triggerFullCrack(){
     setTimeout(shake,34);
   }
   shake();
-  doFlash();spawnParticles(true);
+  doFlash();
+  if(!isSlang) spawnParticles(true);
   if(navigator.vibrate) navigator.vibrate([30,10,70,15,50,10,30,8,20]);
   setStatus(getMsg());
 
   checkUnlocks(crackCount);
   saveState();
 
-  setTimeout(()=>{crackLevel=0;isCracking=false;holdProgress=0;lastCrackAt=0;currentCrackPoly=null;drawBall(0,isFrozen,0,0,0);},720);
+  setTimeout(()=>{
+    crackLevel=0;jellyCrackLevel=0;sherbetCrackLevel=0;icebarCrackLevel=0;
+    isCracking=false;holdProgress=0;lastCrackAt=0;
+    jellyCrackPoly=null;sherbetCrackPoly=null;currentCrackPoly=null;icebarCrackPoly=null;
+    if(isSlang && isFrozen){ drawSlangIcebar(0,0,0,0); }
+    else if(isSlang){ genSlangSherbetPos(); drawSlang(0,0,0,0,0); }
+    else drawBall(0,isFrozen,0,0,0);
+  },720);
 }
 
 // ── UNLOCKS ────────────────────────────────────────────────────
@@ -966,6 +2209,15 @@ function checkUnlocks(n){
       showUnlockToast(f.name);
     }
   });
+  // 가장 가까운 잠금 해제 임박 알림 (3개 이내)
+  const nextLock=FLAVORS.find((f,i)=>!unlocked[i] && f.unlock>0);
+  if(nextLock){
+    const remaining=nextLock.unlock - n;
+    if(remaining>0 && remaining<=3){
+      const em=nextLock.name.split(' ')[0];
+      setTimeout(()=>setStatus(`${em} 해금까지 ${remaining}개만 더! 🎯`),800);
+    }
+  }
 }
 function showUnlockToast(name){
   const t=document.getElementById('unlockToast');
@@ -1015,7 +2267,24 @@ const MSGS=[
   ['중독됐어? 🤔','이게 바로 왁뿌볼! 🫧'],
   ['왁뿌볼 마스터 🏆','완전 ASMR 👂','ㅋㅋ 못 멈추겠어 😂']
 ];
-function getMsg(){const t=Math.min(3,Math.floor(crackCount/5));const a=MSGS[t];return a[Math.floor(Math.random()*a.length)];}
+const SLANG_MSGS=[
+  ['쫀득 터짐! 💚','와사삭! ❄️','쪽! 쪽! 💚','와사삭 팡! 💥'],
+  ['쫀득쫀득~ 😌','샤베트 부서졌어! ✨','이 느낌 미쳐 💚'],
+  ['슬랑이 중독 🫧','쫀득 ASMR 👂','또 또 또! 💚'],
+  ['슬랑이 마스터 🏆','완전 쫀득 마스터 💚','멈출 수 없어~ 😆']
+];
+const ICEBAR_MSGS=[
+  ['아삭! 🍦','와장창! ❄️','아삭아삭! 🧊','쩌드득 ❄️'],
+  ['아이스바 중독 🍦','얼음 부서졌어! ✨','이 소리 실화? 🧊'],
+  ['아삭 ASMR 👂','못 멈추겠어~ 🍦','냉동 마스터 ❄️'],
+  ['아이스바 마스터 🏆','완전 아삭 마스터 🧊','영원히 부수고 싶어 🍦']
+];
+function getMsg(){
+  const t=Math.min(3,Math.floor(crackCount/5));
+  if(isSlang && isFrozen){ const a=ICEBAR_MSGS[t]; return a[Math.floor(Math.random()*a.length)]; }
+  if(isSlang){ const a=SLANG_MSGS[t]; return a[Math.floor(Math.random()*a.length)]; }
+  const a=MSGS[t]; return a[Math.floor(Math.random()*a.length)];
+}
 function setStatus(m){statusEl.style.opacity=0;setTimeout(()=>{statusEl.textContent=m;statusEl.style.opacity=1;},128);}
 
 // ── POINTER ────────────────────────────────────────────────────
@@ -1044,20 +2313,40 @@ scene.addEventListener('touchend',e=>e.preventDefault(),{passive:false});
 
 // ── FREEZE ─────────────────────────────────────────────────────
 function toggleFreeze(){
-  endPress();isFrozen=!isFrozen;crackLevel=0;pressFactor=0;holdProgress=0;lastCrackAt=0;
-  drawBall(0,isFrozen,0,0,0);
-  if(isFrozen){
-    freezeBtn.textContent='🌡️ 꺼내기';
-    freezeBtn.style.background='linear-gradient(135deg,#fde68a,#fbbf24)';
-    freezeBtn.style.color='#78350f';
-    setStatus('❄️ 꽁꽁! 한 방에 쩌드득~');
-    hintEl.textContent='얼리면 더 선명한 우드득!';
+  endPress();isFrozen=!isFrozen;crackLevel=0;jellyCrackLevel=0;sherbetCrackLevel=0;
+  icebarCrackLevel=0;icebarCrackPoly=null;
+  pressFactor=0;holdProgress=0;lastCrackAt=0;
+  if(isSlang){
+    drawSlangIcebar(0,0,0,0);
+    if(isFrozen){
+      freezeBtn.textContent='🌡️ 녹이기';
+      freezeBtn.style.background='linear-gradient(135deg,#bae6fd,#38bdf8)';
+      freezeBtn.style.color='#0c4a6e';
+      setStatus('🍦 슬랑이 아이스바! 아삭아삭~');
+      hintEl.textContent='전체가 샤베트! 어디든 눌러봐 ❄️';
+    } else {
+      drawSlang(0,0,0,0,0);
+      freezeBtn.textContent='❄️ 냉동실';
+      freezeBtn.style.background='linear-gradient(135deg,#a7f3d0,#34d399)';
+      freezeBtn.style.color='#064e3b';
+      setStatus('슬랑이 녹았어~ 쫀득쫀득 💚');
+      hintEl.textContent='흰 부분=와사삭❄️  연두 부분=쫀득💚';
+    }
   } else {
-    freezeBtn.textContent='❄️ 냉동실';
-    freezeBtn.style.background='linear-gradient(135deg,#a7f3d0,#34d399)';
-    freezeBtn.style.color='#064e3b';
-    setStatus('녹았어~ 말랑말랑 🫧');
-    hintEl.textContent='❄️ 얼리면 더 선명해요';
+    drawBall(0,isFrozen,0,0,0);
+    if(isFrozen){
+      freezeBtn.textContent='🌡️ 꺼내기';
+      freezeBtn.style.background='linear-gradient(135deg,#fde68a,#fbbf24)';
+      freezeBtn.style.color='#78350f';
+      setStatus('❄️ 꽁꽁! 한 방에 쩌드득~');
+      hintEl.textContent='얼리면 더 선명한 우드득!';
+    } else {
+      freezeBtn.textContent='❄️ 냉동실';
+      freezeBtn.style.background='linear-gradient(135deg,#a7f3d0,#34d399)';
+      freezeBtn.style.color='#064e3b';
+      setStatus('녹았어~ 말랑말랑 🫧');
+      hintEl.textContent='❄️ 얼리면 더 선명해요';
+    }
   }
 }
 
@@ -1080,16 +2369,182 @@ function tryFlavor(i){
   saveState();
 }
 
-// ── RESET ──────────────────────────────────────────────────────
+// 슬랑이 파티클: 흰 샤베트 파편 + 젤리 조각 + 글리터 반짝이
+function spawnSlangParticles(){
+  const host=document.getElementById('pts');
+  const rect=scene.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  const T=SLANG_THEMES[slangColorIdx];
+  const sherbet=['rgba(255,255,255,0.97)','rgba(245,255,250,0.94)','rgba(235,252,248,0.92)','rgba(250,255,252,0.95)'];
+  const jelly=T.pJelly;
+  const glitter=T.pGlitter;
+  const n=40;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');p.className='pt';
+    const rnd=Math.random();
+    const isSherbet=rnd>0.55;
+    const isGlitter=rnd<0.20;
+    const sz=isSherbet?(5+Math.random()*16):isGlitter?(1.5+Math.random()*4):(3+Math.random()*11);
+    let col,br,aspect;
+    if(isSherbet){
+      col=sherbet[Math.floor(Math.random()*sherbet.length)];
+      br=`${8+Math.random()*18}%`;
+      aspect=0.45+Math.random()*0.65;
+    } else if(isGlitter){
+      col=glitter[Math.floor(Math.random()*glitter.length)];
+      br='50%';
+      aspect=1;
+    } else {
+      col=jelly[Math.floor(Math.random()*jelly.length)];
+      br=`${35+Math.random()*30}%`;
+      aspect=0.7+Math.random()*0.55;
+    }
+    p.style.cssText=`width:${sz}px;height:${sz*aspect}px;left:${cx}px;top:${cy}px;background:${col};border-radius:${br};opacity:1;box-shadow:0 2px 8px rgba(100,180,60,.18);`;
+    host.appendChild(p);
+    const angle=Math.random()*Math.PI*2;
+    const dist=75+Math.random()*185;
+    const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
+    const dur=0.44+Math.random()*0.58;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:1},
+      {transform:`translate(calc(-50% + ${tx}px),calc(-50% + ${ty}px)) scale(0) rotate(${(Math.random()-.5)*260}deg)`,opacity:0}
+    ],{duration:dur*1000,easing:'cubic-bezier(0.1,0,0.6,1)',fill:'forwards'});
+    setTimeout(()=>p.remove(),dur*1000+60);
+  }
+}
+
+// 젤리 레이어 미니 파티클 (쫀득 느낌)
+function spawnJellyMiniParticles(){
+  const host=document.getElementById('pts');
+  const rect=scene.getBoundingClientRect();
+  const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const T=SLANG_THEMES[slangColorIdx];
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div');p.className='pt';
+    const sz=2+Math.random()*6;
+    const col=T.pJelly[Math.floor(Math.random()*Math.min(3,T.pJelly.length))];
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${cx}px;top:${cy}px;background:${col};border-radius:50%;opacity:1;`;
+    host.appendChild(p);
+    const ang=Math.random()*Math.PI*2;
+    const dist=30+Math.random()*55;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(1)',opacity:1},
+      {transform:`translate(calc(-50% + ${Math.cos(ang)*dist}px),calc(-50% + ${Math.sin(ang)*dist}px)) scale(0)`,opacity:0}
+    ],{duration:300+Math.random()*200,easing:'ease-out',fill:'forwards'});
+    setTimeout(()=>p.remove(),520);
+  }
+}
+
+// 샤베트 레이어 미니 파티클 (와사삭 — 흰 각진 파편)
+function spawnSherbetMiniParticles(){
+  const host=document.getElementById('pts');
+  const rect=scene.getBoundingClientRect();
+  const {x:sx,y:sy}=slangSherbetPos;
+  const scaleX=rect.width/W,scaleY=rect.height/H;
+  const cx=rect.left+sx*scaleX,cy=rect.top+sy*scaleY;
+  for(let i=0;i<10;i++){
+    const p=document.createElement('div');p.className='pt';
+    const sz=2+Math.random()*8;
+    const col=['rgba(255,255,255,0.96)','rgba(240,252,238,0.92)','rgba(225,245,220,0.88)'][Math.floor(Math.random()*3)];
+    const br=`${5+Math.random()*15}%`;
+    p.style.cssText=`width:${sz}px;height:${sz*(0.4+Math.random()*0.5)}px;left:${cx}px;top:${cy}px;background:${col};border-radius:${br};opacity:1;`;
+    host.appendChild(p);
+    const ang=Math.random()*Math.PI*2;
+    const dist=25+Math.random()*60;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(1) rotate(0deg)',opacity:1},
+      {transform:`translate(calc(-50% + ${Math.cos(ang)*dist}px),calc(-50% + ${Math.sin(ang)*dist}px)) scale(0) rotate(${(Math.random()-.5)*180}deg)`,opacity:0}
+    ],{duration:260+Math.random()*180,easing:'ease-out',fill:'forwards'});
+    setTimeout(()=>p.remove(),460);
+  }
+}
+// ── SLANG COLOR CYCLE ──────────────────────────────────────────
+function cycleSlangColor(){
+  slangColorIdx=(slangColorIdx+1)%SLANG_THEMES.length;
+  applySlangColorBtn();
+  jellyCrackPoly=null;sherbetCrackPoly=null;icebarCrackPoly=null;
+  if(isSlang && isFrozen) drawSlangIcebar(icebarCrackLevel,0,0,0);
+  else drawSlang(jellyCrackLevel,sherbetCrackLevel,0,0,0);
+}
+function applySlangColorBtn(){
+  const t=SLANG_THEMES[slangColorIdx];
+  const btn=document.getElementById('slangColorBtn');
+  btn.textContent=t.label;
+  btn.className='btn btn-slang-color visible theme-'+t.id;
+  // hold ring 색상도 변경
+  holdRingPath.setAttribute('stroke',t.ring);
+}
+// ── SLANG TOGGLE ───────────────────────────────────────────────
+function toggleSlang(){
+  endPress();
+  isSlang=!isSlang;
+  crackLevel=0;jellyCrackLevel=0;sherbetCrackLevel=0;icebarCrackLevel=0;
+  isCracking=false;pressFactor=0;holdProgress=0;lastCrackAt=0;
+  jellyCrackPoly=null;sherbetCrackPoly=null;currentCrackPoly=null;icebarCrackPoly=null;
+  const btn=document.getElementById('slangBtn');
+  const flavorBtn=document.querySelector('.btn-flavor');
+  if(isSlang){
+    if(!slangUsed){
+      slangUsed=true;
+      btn.classList.add('used');
+      saveState();
+    }
+    btn.classList.add('active');
+    btn.textContent='🫧 슬랑이 ON';
+    if(isFrozen){
+      drawSlangIcebar(0,0,0,0);
+      setStatus('🍦 슬랑이 아이스바! 아삭아삭~');
+      hintEl.textContent='전체가 샤베트! 어디든 눌러봐 ❄️';
+    } else {
+      genSlangSherbetPos();
+      drawSlang(0,0,0,0,0);
+      setStatus('쫀득한 슬랑이~ 꾹 눌러봐! 💚');
+      hintEl.textContent='흰 부분=와사삭❄️  연두 부분=쫀득💚';
+    }
+    applySlangColorBtn();
+    flavorBtn.style.display='none';
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML='🫧 슬랑이'+(slangUsed?'':'<span class="new-badge">NEW</span>');
+    document.getElementById('slangColorBtn').className='btn btn-slang-color';
+    holdRingPath.setAttribute('stroke','#34d399');
+    drawBall(0,isFrozen,0,0,0);
+    setStatus('왁뿌볼로 돌아왔어! 꾹 눌러봐 🤜');
+    hintEl.textContent=isFrozen?'얼리면 더 선명한 우드득!':'❄️ 얼리면 더 선명해요';
+    flavorBtn.style.display='';
+  }
+}
 function resetBall(){
   endPress();
-  crackLevel=0;isCracking=false;pressFactor=0;holdProgress=0;lastCrackAt=0;currentCrackPoly=null;
-  piecesDiv.innerHTML='';drawBall(0,isFrozen,0,0,0);
-  hintEl.textContent=isFrozen?'얼리면 더 선명한 우드득!':'❄️ 얼리면 더 선명해요';
-  setStatus('새 왁뿌볼이야! 눌러봐 🤜');
+  crackLevel=0;jellyCrackLevel=0;sherbetCrackLevel=0;icebarCrackLevel=0;
+  isCracking=false;pressFactor=0;holdProgress=0;lastCrackAt=0;
+  jellyCrackPoly=null;sherbetCrackPoly=null;currentCrackPoly=null;icebarCrackPoly=null;
+  piecesDiv.innerHTML='';
+  if(isSlang && isFrozen){
+    drawSlangIcebar(0,0,0,0);
+    setStatus('새 아이스바! 아삭아삭~ 🍦');
+    hintEl.textContent='전체가 샤베트! 어디든 눌러봐 ❄️';
+  } else if(isSlang){
+    genSlangSherbetPos();
+    drawSlang(0,0,0,0,0);
+    setStatus('새 슬랑이! 꾹 눌러봐 💚');
+    hintEl.textContent='흰 부분=와사삭❄️  연두 부분=쫀득💚';
+  } else {
+    drawBall(0,isFrozen,0,0,0);
+    hintEl.textContent=isFrozen?'얼리면 더 선명한 우드득!':'❄️ 얼리면 더 선명해요';
+    setStatus('새 왁뿌볼이야! 눌러봐 🤜');
+  }
 }
 
 // ── ONBOARDING ─────────────────────────────────────────────────
+let _obStep=1;
+function obNext(){
+  document.getElementById('ob'+_obStep).classList.remove('active');
+  document.getElementById('od'+_obStep).classList.remove('on');
+  _obStep++;
+  document.getElementById('ob'+_obStep).classList.add('active');
+  document.getElementById('od'+_obStep).classList.add('on');
+}
 function dismissOnboarding(){
   document.getElementById('onboarding').classList.add('gone');
   setTimeout(()=>demoPress(),400);
